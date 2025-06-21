@@ -10,10 +10,16 @@ export const PaymentMethods = () => {
 		updateState: { checkoutDeliveryMethodUpdate },
 	} = useCheckoutUpdateState();
 
+	// Debug logging
+	console.log("🔍 PaymentMethods - Available gateways:", availablePaymentGateways);
+	console.log("🔍 PaymentMethods - Payment method mapping:", Object.keys(paymentMethodToComponent));
+
 	// delivery methods change total price so we want to wait until the change is done
 	if (changingBillingCountry || fetching || checkoutDeliveryMethodUpdate === "loading") {
 		return <PaymentSectionSkeleton />;
 	}
+
+	console.log("🎯 PaymentMethods - Rendering gateways:", availablePaymentGateways.length);
 
 	return (
 		<div className="gap-y-8">

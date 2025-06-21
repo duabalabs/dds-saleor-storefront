@@ -41,17 +41,29 @@ interface CheckoutPaymentCreateVariables {
 }
 
 interface PaystackButtonProps {
-	gateway: { id: string; name: string };
+	gateway?: { id: string; name: string } | null;
 	checkout: { id: string; totalPrice: { gross: { amount: number } } };
 }
 
 export function PaystackButton({ gateway, checkout }: PaystackButtonProps) {
+	// Hook must be called before any conditional returns
 	const [{ fetching: loading, error }, createPayment] = useMutation<
 		CheckoutPaymentCreateMutation,
 		CheckoutPaymentCreateVariables
 	>(CHECKOUT_PAYMENT_CREATE_MUTATION);
 
+	// Early return if gateway is not available
+	if (!gateway?.id || !gateway?.name) {
+		return null;
+	}
+
 	const handlePayment = async () => {
+		if (!gateway?.id) {
+			console.error("Gateway ID is not available");
+			alert("Payment gateway is not available. Please try again.");
+			return;
+		}
+
 		try {
 			const result = await createPayment({
 				checkoutId: checkout.id,
@@ -89,7 +101,7 @@ export function PaystackButton({ gateway, checkout }: PaystackButtonProps) {
 
 	return (
 		<button onClick={handlePayment} disabled={loading} style={{ marginTop: "10px", padding: "10px 15px" }}>
-			{loading ? "Processing..." : `Pay with ${gateway.name}`}
+			{loading ? "Processing..." : `Pay with ${gateway?.name ?? "Paystack"}`}
 		</button>
 	);
 }

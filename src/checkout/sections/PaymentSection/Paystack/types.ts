@@ -1,1 +1,1 @@
-export const paystackGatewayId = "app.paystack.sammydamz";
+export const paystackGatewayId = "saleor.app.paystack.sammydamz";

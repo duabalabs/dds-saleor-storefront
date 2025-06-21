@@ -73,3 +73,23 @@ This document outlines the tasks required to integrate the Paystack payment gate
   - [ ] Use a test card to complete the payment.
   - [ ] Confirm redirection back to the storefront's callback URL.
   - [ ] Verify that the payment is processed and the user is redirected to the order confirmation page.
+
+## Troubleshooting
+
+### Error: "No available payment gateways"
+
+- [x] **Root Cause Identified:** The `getFilteredPaymentGateways` function in `utils.ts` was filtering out the Paystack gateway because it wasn't included in the `supportedPaymentGateways` array.
+- [x] **Fix Applied:** Added `paystackGatewayId` to the `supportedPaymentGateways` array in `src/checkout/sections/PaymentSection/utils.ts`.
+- [x] **Debug Logging Added:** Added console logs to help debug payment gateway filtering.
+
+**Required Backend Configuration:**
+
+1. Ensure Paystack payment app is installed and active in Saleor
+2. Verify the app has `HANDLE_PAYMENTS` permission
+3. Configure the app for the correct channel and currency
+4. Ensure the app ID matches `paystackGatewayId` in the storefront
+
+**For Testing:**
+
+- Enable the "Dummy" payment plugin in Saleor Dashboard → Configuration → Plugins
+- This allows testing the payment flow without a real payment provider
