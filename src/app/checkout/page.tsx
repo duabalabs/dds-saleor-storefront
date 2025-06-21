@@ -7,12 +7,33 @@ export const metadata = {
 };
 
 export default async function CheckoutPage(props: {
-	searchParams: Promise<{ checkout?: string; order?: string }>;
+	searchParams: Promise<{
+		checkout?: string;
+		order?: string;
+		paymentStatus?: string;
+		trxref?: string;
+		reference?: string;
+		error?: string;
+	}>;
 }) {
 	const searchParams = await props.searchParams;
 	invariant(process.env.NEXT_PUBLIC_SALEOR_API_URL, "Missing NEXT_PUBLIC_SALEOR_API_URL env variable");
 
-	if (!searchParams.checkout && !searchParams.order) {
+	// Handle payment success callback
+	if (searchParams.paymentStatus === "success" && (searchParams.trxref || searchParams.reference)) {
+		const reference = searchParams.trxref || searchParams.reference;
+		console.log("Payment success callback received with reference:", reference);
+
+		// Continue with the normal checkout flow to let PaystackSuccessHandler handle it
+	}
+
+	// Handle payment errors
+	if (searchParams.error) {
+		console.error("Payment error:", searchParams.error);
+	}
+
+	// Only return null if there's no checkout, order, OR payment callback
+	if (!searchParams.checkout && !searchParams.order && !searchParams.paymentStatus && !searchParams.error) {
 		return null;
 	}
 

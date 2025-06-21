@@ -14,38 +14,64 @@ export const usePaymentGatewaysInitialize = () => {
 		checkout: { id: checkoutId, availablePaymentGateways },
 	} = useCheckout();
 
-	const billingCountry = billingAddress?.country.code as MightNotExist<CountryCode>;
+	// Debug logging for payment gateways
+	console.log("🔍 usePaymentGatewaysInitialize - Raw availablePaymentGateways:", availablePaymentGateways);
+	console.log(
+		"🔍 usePaymentGatewaysInitialize - availablePaymentGateways length:",
+		availablePaymentGateways.length,
+	);
 
+	const billingCountry = billingAddress?.country.code as MightNotExist<CountryCode>;
 	const [gatewayConfigs, setGatewayConfigs] = useState<ParsedPaymentGateways>([]);
 	const previousBillingCountry = useRef(billingCountry);
 
 	const [{ fetching }, paymentGatewaysInitialize] = usePaymentGatewaysInitializeMutation();
 
+	// Debug filtered gateways
+	const filteredGateways = getFilteredPaymentGateways(availablePaymentGateways);
+	console.log("🔍 usePaymentGatewaysInitialize - Filtered gateways:", filteredGateways);
+	console.log("🔍 usePaymentGatewaysInitialize - Filtered gateways length:", filteredGateways.length);
 	const onSubmit = useSubmit<{}, typeof paymentGatewaysInitialize>(
 		useMemo(
 			() => ({
 				hideAlerts: true,
 				scope: "paymentGatewaysInitialize",
-				shouldAbort: () => !availablePaymentGateways.length,
+				shouldAbort: () => {
+					const shouldAbort = !availablePaymentGateways.length;
+					console.log(
+						"🔍 usePaymentGatewaysInitialize - shouldAbort:",
+						shouldAbort,
+						"availablePaymentGateways.length:",
+						availablePaymentGateways.length,
+					);
+					return shouldAbort;
+				},
 				onSubmit: paymentGatewaysInitialize,
-				parse: () => ({
-					checkoutId,
-					paymentGateways: getFilteredPaymentGateways(availablePaymentGateways).map(({ config, id }) => ({
-						id,
-						data: config,
-					})),
-				}),
+				parse: () => {
+					const payload = {
+						checkoutId,
+						paymentGateways: getFilteredPaymentGateways(availablePaymentGateways).map(({ config, id }) => ({
+							id,
+							data: config,
+						})),
+					};
+					console.log("🔍 usePaymentGatewaysInitialize - Mutation payload:", payload);
+					return payload;
+				},
 				onSuccess: ({ data }) => {
+					console.log("🔍 usePaymentGatewaysInitialize - Mutation success:", data);
 					const parsedConfigs = (data.gatewayConfigs || []) as ParsedPaymentGateways;
 
 					if (!parsedConfigs.length) {
+						console.error("🔍 usePaymentGatewaysInitialize - No gateway configs returned");
 						throw new Error("No available payment gateways");
 					}
 
+					console.log("🔍 usePaymentGatewaysInitialize - Setting gateway configs:", parsedConfigs);
 					setGatewayConfigs(parsedConfigs);
 				},
 				onError: ({ errors }) => {
-					console.log({ errors });
+					console.error("🔍 usePaymentGatewaysInitialize - Mutation error:", errors);
 				},
 			}),
 			[availablePaymentGateways, checkoutId, paymentGatewaysInitialize],

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Suspense, type ReactNode } from "react";
 import { type Metadata } from "next";
 import { DraftModeNotification } from "@/ui/components/DraftModeNotification";
+// import { HydrationWarningSuppressionWrapper } from "@/lib/HydrationWarningSuppressionWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 

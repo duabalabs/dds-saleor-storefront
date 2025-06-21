@@ -14,6 +14,10 @@ const queryParamsMap = {
 	// payment flow
 	transaction: "transaction", // allows us to process started transaction
 	processingPayment: "processingPayment", // tell the processing screen to show up
+	// paystack
+	paymentStatus: "paymentStatus",
+	trxref: "trxref",
+	reference: "reference",
 	// adyen
 	redirectResult: "redirectResult",
 	resultCode: "resultCode",
@@ -107,11 +111,56 @@ export const replaceUrl = ({
 	return newUrl;
 };
 
+// Get checkout ID from storage only
+export const getCheckoutId = (): string | null => {
+	// Only try to get from sessionStorage
+	if (typeof window !== "undefined") {
+		try {
+			// Try direct checkout ID storage
+			const storedCheckoutId = sessionStorage.getItem("saleor-checkout-id");
+			if (storedCheckoutId) {
+				return storedCheckoutId;
+			}
+
+			// Try to extract from stored checkout data
+			const storedCheckoutData = sessionStorage.getItem("saleor-checkout");
+			if (storedCheckoutData) {
+				const checkoutData = JSON.parse(storedCheckoutData) as { id?: string };
+				if (checkoutData?.id) {
+					return checkoutData.id;
+				}
+			}
+		} catch (error) {
+			console.warn("Failed to retrieve checkout ID from storage:", error);
+		}
+	}
+
+	return null;
+};
+
 export const extractCheckoutIdFromUrl = (): string => {
-	const { checkoutId } = getQueryParams();
+	const { checkoutId, paymentStatus, trxref, reference } = getQueryParams();
 
 	if (isOrderConfirmationPage()) {
 		return "";
+	}
+
+	// Handle payment success callback - extract checkout ID from reference
+	if (paymentStatus === "success" && (trxref || reference)) {
+		const paymentReference = trxref || reference;
+		if (typeof paymentReference === "string") {
+			// Extract checkout ID from reference format: checkout-ENCODED_CHECKOUT_ID-TIMESTAMP
+			const match = paymentReference.match(/^checkout-([^-]+)-\d+$/);
+			if (match?.[1]) {
+				try {
+					// Try to decode base64 - if it fails, use the value directly
+					const decoded = atob(match[1]);
+					return decoded;
+				} catch (error) {
+					return match[1]; // Return the checkout ID directly if not base64
+				}
+			}
+		}
 	}
 
 	if (typeof checkoutId !== "string") {
