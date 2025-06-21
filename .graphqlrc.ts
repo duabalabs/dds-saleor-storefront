@@ -30,6 +30,7 @@ const config: CodegenConfig = {
 				useTypeImports: true,
 				strictScalars: true,
 				scalars: {
+					Hour: "number",
 					Date: "string",
 					DateTime: "string",
 					Day: "number",

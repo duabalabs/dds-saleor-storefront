@@ -42,5 +42,13 @@ query CheckoutFind($id: ID!) {
 				currency
 			}
 		}
+		availablePaymentGateways {
+			id
+			name
+			config {
+				field
+				value
+			}
+		}
 	}
 }
