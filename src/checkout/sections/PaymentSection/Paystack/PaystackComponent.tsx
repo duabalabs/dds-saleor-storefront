@@ -45,6 +45,32 @@ export const PaystackComponent = ({ config }: PaymentMethodProps) => {
 	const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
 	const gatewayId = config?.id || PAYSTACK_GATEWAY_ID;
 
+	// Currency conversion configuration
+	const currencyConversionEnabled = process.env.NEXT_PUBLIC_PAYSTACK_CURRENCY_CONVERSION_ENABLED === "true";
+	const targetCurrency = process.env.NEXT_PUBLIC_PAYSTACK_TARGET_CURRENCY || "GHS";
+	const usdToGhsRate = parseFloat(process.env.NEXT_PUBLIC_PAYSTACK_USD_TO_GHS_RATE || "14.5");
+
+	// Helper function to convert currency if needed
+	const convertCurrency = (
+		amount: number,
+		fromCurrency: string,
+	): { amount: number; currency: string; exchangeRate?: number } => {
+		if (!currencyConversionEnabled || fromCurrency !== "USD" || targetCurrency === "USD") {
+			return { amount, currency: fromCurrency };
+		}
+
+		if (fromCurrency === "USD" && targetCurrency === "GHS") {
+			return {
+				amount: amount * usdToGhsRate,
+				currency: targetCurrency,
+				exchangeRate: usdToGhsRate,
+			};
+		}
+
+		// Default: no conversion
+		return { amount, currency: fromCurrency };
+	};
+
 	// Debug logging for development
 	if (process.env.NODE_ENV === "development") {
 		console.log("🔧 PaystackComponent Debug:", {
@@ -85,16 +111,24 @@ export const PaystackComponent = ({ config }: PaymentMethodProps) => {
 
 		try {
 			const amount = checkout.totalPrice?.gross.amount || 0;
-			const currency = checkout.totalPrice?.gross.currency || "USD";
+			const originalCurrency = checkout.totalPrice?.gross.currency || "USD";
 			const email = checkout.email || "customer@example.com";
 			const reference = `saleor_${checkout.id}_${Date.now()}`;
 
-			// Convert amount to kobo (smallest currency unit for Paystack)
-			const amountInKobo = Math.round(amount * 100);
+			// Apply currency conversion if needed
+			const converted = convertCurrency(amount, originalCurrency);
+			const { amount: convertedAmount, currency: finalCurrency, exchangeRate } = converted;
+
+			// Convert amount to smallest currency unit (pesewas for GHS, cents for USD, etc.)
+			const amountInSmallestUnit = Math.round(convertedAmount * 100);
 
 			console.log("🚀 Initializing Paystack payment:", {
-				amount: amountInKobo,
-				currency,
+				originalAmount: amount,
+				originalCurrency,
+				convertedAmount,
+				finalCurrency,
+				exchangeRate,
+				amountInSmallestUnit,
 				email,
 				reference,
 				gatewayId,
@@ -109,12 +143,13 @@ export const PaystackComponent = ({ config }: PaymentMethodProps) => {
 			const paystack = window.PaystackPop?.setup({
 				key: publicKey,
 				email,
-				amount: amountInKobo,
-				currency,
+				amount: amountInSmallestUnit,
+				currency: finalCurrency,
 				ref: reference,
-				callback: async (response: PaystackResponse) => {
+				callback: (response: PaystackResponse) => {
 					console.log("✅ Paystack payment successful:", response);
-					await handlePaymentSuccess(response);
+					// Handle async operations without await to keep callback synchronous
+					void handlePaymentSuccess(response);
 				},
 				onClose: () => {
 					console.log("❌ Paystack payment cancelled");
@@ -192,11 +227,20 @@ export const PaystackComponent = ({ config }: PaymentMethodProps) => {
 	};
 
 	const isButtonDisabled = isLoading || completingCheckout || !checkout.totalPrice?.gross.amount;
+
+	// Calculate display amounts for UI
+	const originalAmount = checkout.totalPrice?.gross.amount || 0;
+	const originalCurrency = checkout.totalPrice?.gross.currency || "USD";
+	const converted = convertCurrency(originalAmount, originalCurrency);
+	const { amount: convertedAmount, currency: finalCurrency, exchangeRate } = converted;
+
 	const buttonText = isLoading
 		? "Processing Payment..."
 		: completingCheckout
 			? "Creating Order..."
-			: `Pay ${checkout.totalPrice?.gross.amount} ${checkout.totalPrice?.gross.currency} with Paystack`;
+			: exchangeRate
+				? `Pay ${convertedAmount.toFixed(2)} ${finalCurrency} with Paystack`
+				: `Pay ${originalAmount} ${originalCurrency} with Paystack`;
 
 	return (
 		<div className="space-y-4">
@@ -205,7 +249,18 @@ export const PaystackComponent = ({ config }: PaymentMethodProps) => {
 				<div className="font-medium text-blue-800">🚀 Paystack Payment Gateway</div>
 				<div className="text-blue-700">Gateway ID: {gatewayId}</div>
 				<div className="text-blue-700">
-					Amount: {checkout.totalPrice?.gross.amount} {checkout.totalPrice?.gross.currency}
+					Amount: {originalAmount} {originalCurrency}
+					{exchangeRate && (
+						<>
+							{" → "}
+							<span className="font-medium">
+								{convertedAmount.toFixed(2)} {finalCurrency}
+							</span>
+							<div className="mt-1 text-xs text-blue-600">
+								Exchange Rate: 1 {originalCurrency} = {exchangeRate} {finalCurrency}
+							</div>
+						</>
+					)}
 				</div>
 			</div>
 
@@ -242,8 +297,12 @@ export const PaystackComponent = ({ config }: PaymentMethodProps) => {
 								gatewayId,
 								checkoutId: checkout.id,
 								hasPublicKey: !!publicKey,
-								amount: checkout.totalPrice?.gross.amount,
-								currency: checkout.totalPrice?.gross.currency,
+								originalAmount,
+								originalCurrency,
+								convertedAmount: convertedAmount.toFixed(2),
+								finalCurrency,
+								exchangeRate,
+								currencyConversionEnabled,
 								email: checkout.email,
 							},
 							null,
