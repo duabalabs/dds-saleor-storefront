@@ -102,11 +102,12 @@ export const useAdyenDropin = (props: AdyenDropinProps) => {
 			if (action) {
 				adyenCheckoutSubmitParams?.component.handleAction(action);
 			}
-
 			switch (resultCode) {
 				case "Authorised":
 					adyenCheckoutSubmitParams?.component.setStatus("success");
-					void onCheckoutComplete();
+					if (onCheckoutComplete) {
+						void onCheckoutComplete();
+					}
 					return;
 				case "Error":
 					adyenCheckoutSubmitParams?.component.setStatus("error");

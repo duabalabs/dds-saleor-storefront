@@ -1,0 +1,15 @@
+mutation CheckoutPaymentCreate($checkoutId: ID!, $gateway: String!, $amount: PositiveDecimal!) {
+	checkoutPaymentCreate(id: $checkoutId, input: { gateway: $gateway, amount: $amount }) {
+		payment {
+			id
+			gateway
+			paymentMethodType
+			token
+		}
+		errors {
+			code
+			field
+			message
+		}
+	}
+}
