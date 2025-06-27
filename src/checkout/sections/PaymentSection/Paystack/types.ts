@@ -42,3 +42,4 @@ export interface TransactionInitializeResponse {
 
 // Paystack gateway configuration
 export const PAYSTACK_GATEWAY_ID = "saleor.app.paystack.sammydamz";
+export const paystackGatewayId = PAYSTACK_GATEWAY_ID; // For compatibility with utils.ts
