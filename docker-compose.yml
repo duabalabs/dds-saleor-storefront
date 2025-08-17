@@ -1,21 +1,31 @@
 version: "3"
 
 services:
-  saleor-storefront:
-    container_name: saleor-storefront
+  saleor-app-checkout:
+    container_name: saleor-app-checkout
     build:
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.base
       args:
-        NEXT_PUBLIC_SALEOR_API_URL: ${NEXT_PUBLIC_SALEOR_API_URL}
-        NEXT_PUBLIC_STOREFRONT_URL: ${NEXT_PUBLIC_STOREFRONT_URL}
-    restart: always
+        - SALEOR_API_URL=http://localhost:8000/graphql/ # handled by nginx
+        - CHECKOUT_APP_URL=http://localhost:3001
+        - CHECKOUT_STOREFRONT_URL=http://localhost:3001/checkout-spa/
+        - CLOUD_DEPLOYMENT_URL=
+        - CUSTOM_API=http://localhost:8080/graphql
+    ports:
+      - 3001:3001
+    command: pnpm turbo run start --filter=saleor-app-checkout...
+  storefront:
+    container_name: storefront
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        - SALEOR_API_URL=http://localhost:8000/graphql/ # handled by nginx
+        - STOREFRONT_URL=http://localhost:3000
+        - CHECKOUT_APP_URL=http://localhost:3001
+        - CHECKOUT_STOREFRONT_URL=http://localhost:3001/checkout-spa/
+        - CLOUD_DEPLOYMENT_URL=
     ports:
       - 3000:3000
-    networks:
-      - saleor_network
-
-  # Add more containers below (nginx, postgres, etc.)
-
-networks:
-  saleor_network:
-    external: false
+    command: sh -c '(nginx &) && pnpm turbo run start --filter=storefront...'
