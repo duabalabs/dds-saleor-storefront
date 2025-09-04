@@ -1,0 +1,46 @@
+query ProductListAllChannels($first: Int!, $after: String) {
+	products(first: $first, after: $after) {
+		edges {
+			node {
+				id
+				name
+				slug
+				description
+				thumbnail {
+					url
+					alt
+				}
+				defaultVariant {
+					id
+					pricing {
+						price {
+							gross {
+								amount
+								currency
+							}
+						}
+					}
+				}
+				channel
+				category {
+					name
+					slug
+				}
+			}
+		}
+		pageInfo {
+			hasNextPage
+			hasPreviousPage
+			startCursor
+			endCursor
+		}
+		totalCount
+	}
+
+	channels {
+		id
+		name
+		slug
+		isActive
+	}
+}

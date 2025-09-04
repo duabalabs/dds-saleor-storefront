@@ -27,6 +27,7 @@ export async function executeGraphQL<Result, Variables>(
 		headers: {
 			"Content-Type": "application/json",
 			...headers,
+			Authorization: `Bearer ${process.env.NEXT_PUBLIC_SALEOR_API_TOKEN}`,
 		},
 		body: JSON.stringify({
 			query: operation.toString(),

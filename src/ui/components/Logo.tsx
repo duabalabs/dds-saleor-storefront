@@ -1,25 +1,33 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { env } from "@/app/config";
 
-import { usePathname } from "next/navigation";
-import { LinkWithChannel } from "../atoms/LinkWithChannel";
+export function Logo({ channel }: { channel: string }) {
+	const isMarketplaceMode = env.STORE_MODE === "marketplace";
 
-const companyName = "ACME";
+	// In marketplace mode, logo goes to homepage
+	// In single store mode, logo goes to channel homepage
+	const href = isMarketplaceMode ? "/" : `/${channel}`;
 
-export const Logo = () => {
-	const pathname = usePathname();
-
-	if (pathname === "/") {
-		return (
-			<h1 className="flex items-center font-bold" aria-label="homepage">
-				{companyName}
-			</h1>
-		);
-	}
-	return (
-		<div className="flex items-center font-bold">
-			<LinkWithChannel aria-label="homepage" href="/">
-				{companyName}
-			</LinkWithChannel>
+	const logoContent = (
+		<div className="flex items-center space-x-2">
+			<Image
+				src="/logo.png"
+				alt="Sellub Logo"
+				width={40}
+				height={40}
+				priority
+				className="transition-opacity hover:opacity-80"
+			/>
+			<span className="text-xl font-bold text-gray-900">
+				{isMarketplaceMode ? "Sellub" : channel.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+			</span>
 		</div>
 	);
-};
+
+	return (
+		<Link href={href} className="flex items-center">
+			{logoContent}
+		</Link>
+	);
+}

@@ -5,7 +5,6 @@ import { ChannelsListDocument } from "@/gql/graphql";
 export const generateStaticParams = async () => {
 	// the `channels` query is protected
 	// you can either hardcode the channels or use an app token to fetch the channel list here
-
 	if (process.env.SALEOR_APP_TOKEN) {
 		const channels = await executeGraphQL(ChannelsListDocument, {
 			withAuth: false, // disable cookie-based auth for this call

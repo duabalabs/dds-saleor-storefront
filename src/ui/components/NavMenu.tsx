@@ -1,0 +1,50 @@
+import { MenuFragment } from "@/gql/graphql";
+import Link from "next/link";
+
+interface NavMenuProps {
+	menu: MenuFragment;
+}
+
+export function NavMenu({ menu }: NavMenuProps) {
+	return (
+		<nav className="py-4">
+			<ul className="flex items-center space-x-8 overflow-x-auto">
+				{menu.items?.map((item) => (
+					<li key={item.id} className="whitespace-nowrap">
+						{item.url ? (
+							<Link
+								href={item.url}
+								className="font-medium text-gray-700 transition-colors hover:text-gray-900"
+							>
+								{item.name}
+							</Link>
+						) : item.category ? (
+							<Link
+								href={`/categories/${item.category.slug}`}
+								className="font-medium text-gray-700 transition-colors hover:text-gray-900"
+							>
+								{item.name}
+							</Link>
+						) : item.collection ? (
+							<Link
+								href={`/collections/${item.collection.slug}`}
+								className="font-medium text-gray-700 transition-colors hover:text-gray-900"
+							>
+								{item.name}
+							</Link>
+						) : item.page ? (
+							<Link
+								href={`/pages/${item.page.slug}`}
+								className="font-medium text-gray-700 transition-colors hover:text-gray-900"
+							>
+								{item.name}
+							</Link>
+						) : (
+							<span className="font-medium text-gray-700">{item.name}</span>
+						)}
+					</li>
+				))}
+			</ul>
+		</nav>
+	);
+}
