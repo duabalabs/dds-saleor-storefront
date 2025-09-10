@@ -1,5 +1,3 @@
-import { executeGraphQL } from "@/lib/graphql";
-import { ChannelsListDocument } from "@/gql/graphql";
 import Link from "next/link";
 
 interface ChannelHeroProps {

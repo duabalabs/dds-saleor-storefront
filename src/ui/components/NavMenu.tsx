@@ -1,8 +1,8 @@
-import { MenuFragment } from "@/gql/graphql";
 import Link from "next/link";
+import { type MenuItemFragment } from "@/gql/graphql";
 
 interface NavMenuProps {
-	menu: MenuFragment;
+	menu: MenuItemFragment;
 }
 
 export function NavMenu({ menu }: NavMenuProps) {

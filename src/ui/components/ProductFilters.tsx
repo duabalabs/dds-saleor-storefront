@@ -14,7 +14,7 @@ export interface ProductFilters {
 	fastDelivery: boolean;
 }
 
-export function ProductFilters({ onFiltersChange, channel }: ProductFiltersProps) {
+export function ProductFilters({ onFiltersChange }: ProductFiltersProps) {
 	const [filters, setFilters] = useState<ProductFilters>({
 		priceRange: { min: 0, max: 10000 },
 		category: "",

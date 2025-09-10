@@ -1,19 +1,18 @@
-import Link from "next/link";
 import Image from "next/image";
 import { LinkWithChannel } from "../atoms/LinkWithChannel";
 import { ChannelSelect } from "./ChannelSelect";
-import { ChannelsListDocument, MenuGetBySlugDocument } from "@/gql/graphql";
+import { ChannelsListDocument } from "@/gql/graphql";
 import { executeGraphQL } from "@/lib/graphql";
 
 export async function Footer() {
 	const channels = process.env.SALEOR_APP_TOKEN
 		? await executeGraphQL(ChannelsListDocument, {
-				withAuth: false, // disable cookie-based auth for this call
-				headers: {
-					// and use app token instead
-					Authorization: `Bearer ${process.env.SALEOR_APP_TOKEN}`,
-				},
-			})
+			withAuth: false, // disable cookie-based auth for this call
+			headers: {
+				// and use app token instead
+				Authorization: `Bearer ${process.env.SALEOR_APP_TOKEN}`,
+			},
+		})
 		: null;
 	const currentYear = new Date().getFullYear();
 
@@ -169,13 +168,13 @@ export async function Footer() {
 				</div>
 
 				{/* Channel Selector */}
-				{channels?.channels && (
+				{/* {channels?.channels && (
 					<div className="border-t border-gray-800 py-6">
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
 							<div className="mb-4 sm:mb-0">
 								<label className="flex items-center space-x-2 text-sm text-gray-300">
 									<span>🌍 Change region/currency:</span>
-									<ChannelSelect channels={channels.channels} />
+									<ChannelSelect channels={channels.channels} currentChannel={currentChannel} />
 								</label>
 							</div>
 							<div className="flex items-center space-x-1 text-sm text-gray-300">
@@ -186,7 +185,7 @@ export async function Footer() {
 							</div>
 						</div>
 					</div>
-				)}
+				)} */}
 
 				{/* Bottom Bar */}
 				<div className="border-t border-gray-800 py-6">

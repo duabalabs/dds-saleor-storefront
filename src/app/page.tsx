@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { env, isMarketplaceMode } from "./config";
 import { ClientHomePage } from "@/components/ClientHomePage";
-import { ProductListPaginatedDocument, CategoriesListDocument, ChannelsListDocument } from "@/gql/graphql";
+import { ProductListPaginatedDocument, ChannelsListDocument } from "@/gql/graphql";
 import { executeGraphQL } from "@/lib/graphql";
 
 export const metadata = {
@@ -40,9 +40,9 @@ export default async function HomePage() {
 		const products = productsData.products?.edges.map(({ node: product }) => product) || [];
 
 		// Get categories from GraphQL
-		const categoriesData = [];
+		const categoriesData: any = [];
 		const categories =
-			categoriesData.categories?.edges.map(({ node }) => ({
+			categoriesData.categories?.edges.map(({ node }: any) => ({
 				id: node.id,
 				name: node.name,
 				slug: node.slug,

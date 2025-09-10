@@ -2,29 +2,7 @@
 import { Box } from "@mui/material";
 import { ProductElement } from "./ProductElement";
 
-type ProductListProps = {
-	products: Array<{
-		id: string;
-		name: string;
-		slug: string;
-		thumbnail?: { url: string; alt?: string | null } | null;
-		defaultVariant?: {
-			pricing?: {
-				price?: {
-					gross: {
-						amount: number;
-						currency: string;
-					};
-				} | null;
-			} | null;
-		} | null;
-		channel?: string;
-		category?: { name: string; slug: string } | null;
-	}>;
-	showShopName?: boolean;
-};
-
-export function ProductList({ products, showShopName = false }: ProductListProps) {
+export function ProductList({ products, showShopName = false }: any) {
 	return (
 		<Box
 			component="ul"
@@ -43,7 +21,7 @@ export function ProductList({ products, showShopName = false }: ProductListProps
 			}}
 			data-testid="ProductList"
 		>
-			{products.map((product) => (
+			{products.map((product: any) => (
 				<ProductElement key={product.id} product={product} showShopName={showShopName} />
 			))}
 		</Box>

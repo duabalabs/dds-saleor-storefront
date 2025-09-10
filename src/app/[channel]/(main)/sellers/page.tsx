@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { executeGraphQL } from "@/lib/graphql";
-import { ChannelsListDocument } from "@/gql/graphql";
 
 export const metadata = {
 	title: "Browse Sellers · Sellub Marketplace",
@@ -8,8 +6,7 @@ export const metadata = {
 		"Discover trusted sellers and local businesses across Africa. Find quality products from verified merchants.",
 };
 
-export default async function SellersPage(props: { params: Promise<{ channel: string }> }) {
-	const params = await props.params;
+export default async function SellersPage() {
 
 	// In a real implementation, you'd have a sellers query
 	// For now, we'll use sample data representing channels as sellers
