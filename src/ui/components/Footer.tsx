@@ -1,19 +1,7 @@
 import Image from "next/image";
 import { LinkWithChannel } from "../atoms/LinkWithChannel";
-import { ChannelSelect } from "./ChannelSelect";
-import { ChannelsListDocument } from "@/gql/graphql";
-import { executeGraphQL } from "@/lib/graphql";
 
 export async function Footer() {
-	const channels = process.env.SALEOR_APP_TOKEN
-		? await executeGraphQL(ChannelsListDocument, {
-			withAuth: false, // disable cookie-based auth for this call
-			headers: {
-				// and use app token instead
-				Authorization: `Bearer ${process.env.SALEOR_APP_TOKEN}`,
-			},
-		})
-		: null;
 	const currentYear = new Date().getFullYear();
 
 	return (

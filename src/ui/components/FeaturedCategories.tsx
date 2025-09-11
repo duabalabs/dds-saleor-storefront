@@ -2,20 +2,7 @@ import Link from "next/link";
 import { Box, Container, Typography, Card, CardContent, Button } from "@mui/material";
 import { ArrowForward as ArrowForwardIcon } from "@mui/icons-material";
 import { env } from "@/app/config";
-
-interface Category {
-	id: string;
-	name: string;
-	slug: string;
-	description?: string | null;
-	backgroundImage?: {
-		url: string;
-		alt?: string | null;
-	} | null;
-	products?: {
-		totalCount?: number;
-	} | null;
-}
+import { type Category } from "@/gql/graphql";
 
 interface FeaturedCategoriesProps {
 	categories?: Category[];

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductListPaginatedDocument } from "@/gql/graphql";
+import { type Product, ProductListPaginatedDocument } from "@/gql/graphql";
 import { executeGraphQL } from "@/lib/graphql";
 import { ProductList } from "@/ui/components/ProductList";
 import { env, isMarketplaceMode } from "@/app/config";
@@ -102,31 +102,7 @@ export default async function ChannelPage(props: ChannelPageProps) {
 			{/* Products Grid */}
 			{products.length > 0 ? (
 				<section className="mx-auto max-w-7xl p-8">
-					<ProductList
-						products={products.map((product) => ({
-							id: product.id,
-							name: product.name,
-							slug: product.slug,
-							thumbnail: product.thumbnail,
-							defaultVariant: product.pricing?.priceRange?.start
-								? {
-										pricing: {
-											price: {
-												gross: product.pricing.priceRange.start.gross,
-											},
-										},
-									}
-								: null,
-							channel: params.channel,
-							category: product.category
-								? {
-										name: product.category.name,
-										slug: product.category.name.toLowerCase().replace(/\s+/g, "-"),
-									}
-								: null,
-						}))}
-						showShopName={false}
-					/>
+					<ProductList products={products as Product[]} showShopName={false} />
 				</section>
 			) : (
 				<section className="mx-auto max-w-7xl p-8 py-16 text-center">

@@ -3,10 +3,10 @@
 import { useState, useMemo } from "react";
 import { ProductList } from "@/ui/components/ProductList";
 import { ProductFilters, type ProductFilters as Filters } from "@/ui/components/ProductFilters";
-import type { ProductListItemFragment } from "@/gql/graphql";
+import type { Product } from "@/gql/graphql";
 
 interface ProductsPageClientProps {
-	initialProducts: readonly ProductListItemFragment[];
+	initialProducts: readonly Product[];
 	channel: string;
 	initialSort?: string;
 	initialCategory?: string;

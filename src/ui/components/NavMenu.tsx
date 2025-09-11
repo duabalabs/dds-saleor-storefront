@@ -2,14 +2,14 @@ import Link from "next/link";
 import { type MenuItemFragment } from "@/gql/graphql";
 
 interface NavMenuProps {
-	menu: MenuItemFragment;
+	items: MenuItemFragment[];
 }
 
-export function NavMenu({ menu }: NavMenuProps) {
+export function NavMenu({ items }: NavMenuProps) {
 	return (
 		<nav className="py-4">
 			<ul className="flex items-center space-x-8 overflow-x-auto">
-				{menu.items?.map((item) => (
+				{items.map((item) => (
 					<li key={item.id} className="whitespace-nowrap">
 						{item.url ? (
 							<Link

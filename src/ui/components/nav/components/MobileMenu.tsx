@@ -29,7 +29,7 @@ export const MobileMenu = ({ children }: Props) => {
 							leaveFrom="bg-neutral-100"
 							leaveTo="bg-transparent"
 						>
-							<Logo />
+							<Logo channel={"Sellub"} />
 							<CloseButton onClick={closeMenu} aria-controls="mobile-menu" />
 						</Transition.Child>
 						<Transition.Child

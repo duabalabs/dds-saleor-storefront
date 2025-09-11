@@ -1,8 +1,14 @@
 "use client";
 import { Box } from "@mui/material";
 import { ProductElement } from "./ProductElement";
+import { type Product } from "@/gql/graphql";
 
-export function ProductList({ products, showShopName = false }: any) {
+interface ProductListProps {
+	products: Product[];
+	showShopName?: boolean;
+}
+
+export function ProductList({ products, showShopName = false }: ProductListProps) {
 	return (
 		<Box
 			component="ul"
@@ -21,7 +27,7 @@ export function ProductList({ products, showShopName = false }: any) {
 			}}
 			data-testid="ProductList"
 		>
-			{products.map((product: any) => (
+			{products.map((product) => (
 				<ProductElement key={product.id} product={product} showShopName={showShopName} />
 			))}
 		</Box>

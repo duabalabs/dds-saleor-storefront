@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ProductListPaginatedDocument } from "@/gql/graphql";
+import { type Product, ProductListPaginatedDocument } from "@/gql/graphql";
 import { executeGraphQL } from "@/lib/graphql";
 import { Pagination } from "@/ui/components/Pagination";
 import { ProductList } from "@/ui/components/ProductList";
@@ -60,7 +60,7 @@ export default async function Page(props: {
 			{/* Enhanced Product Grid */}
 			<div className="p-8">
 				{products.edges.length > 0 ? (
-					<ProductList products={products.edges.map((e) => e.node)} />
+					<ProductList products={products.edges.map((e) => e.node) as Product[]} />
 				) : (
 					<div className="py-16 text-center">
 						<p className="mb-4 text-lg text-gray-500">No products found</p>

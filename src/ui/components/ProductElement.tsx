@@ -2,26 +2,10 @@ import Link from "next/link";
 import { Card, CardContent, Typography, Box, Chip, Rating, Stack } from "@mui/material";
 import { Store as StoreIcon } from "@mui/icons-material";
 import { ProductImageWrapper } from "./ProductImageWrapper";
+import { type Product } from "@/gql/graphql";
 
 type ProductElementProps = {
-	product: {
-		id: string;
-		name: string;
-		slug: string;
-		thumbnail?: { url: string; alt?: string | null } | null;
-		defaultVariant?: {
-			pricing?: {
-				price?: {
-					gross: {
-						amount: number;
-						currency: string;
-					};
-				} | null;
-			} | null;
-		} | null;
-		channel?: string;
-		category?: { name: string; slug: string } | null;
-	};
+	product: Product;
 	showShopName?: boolean;
 };
 

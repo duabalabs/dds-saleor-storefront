@@ -3,7 +3,12 @@ import Link from "next/link";
 
 import { env, isMarketplaceMode } from "./config";
 import { ClientHomePage } from "@/components/ClientHomePage";
-import { ProductListPaginatedDocument, ChannelsListDocument } from "@/gql/graphql";
+import {
+	ProductListPaginatedDocument,
+	ChannelsListDocument,
+	type Product,
+	type Category,
+} from "@/gql/graphql";
 import { executeGraphQL } from "@/lib/graphql";
 
 export const metadata = {
@@ -40,9 +45,21 @@ export default async function HomePage() {
 		const products = productsData.products?.edges.map(({ node: product }) => product) || [];
 
 		// Get categories from GraphQL
-		const categoriesData: any = [];
+		const categoriesData: {
+			categories?: {
+				edges: {
+					node: {
+						id: string;
+						name: string;
+						slug: string;
+						description?: string;
+						products?: { totalCount?: number };
+					};
+				}[];
+			};
+		} = { categories: { edges: [] } };
 		const categories =
-			categoriesData.categories?.edges.map(({ node }: any) => ({
+			categoriesData.categories?.edges.map(({ node }) => ({
 				id: node.id,
 				name: node.name,
 				slug: node.slug,
@@ -50,7 +67,13 @@ export default async function HomePage() {
 				products: { totalCount: node.products?.totalCount || 0 },
 			})) || [];
 
-		return <ClientHomePage products={products} categories={categories} isMarketplaceMode={true} />;
+		return (
+			<ClientHomePage
+				products={products as Product[]}
+				categories={categories as Category[]}
+				isMarketplaceMode={true}
+			/>
+		);
 	} catch (error) {
 		console.error("Error loading homepage data:", error);
 
